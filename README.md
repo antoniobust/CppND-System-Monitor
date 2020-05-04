@@ -4,9 +4,6 @@ System Monitor is part of the [Udacity C++ Nanodegree Program](https://www.udaci
 
 ![System Monitor](images/monitor.png)
 
-## Udacity Linux Workspace
-[Udacity](https://www.udacity.com/) provides a browser-based Linux [Workspace](https://engineering.udacity.com/creating-a-gpu-enhanced-virtual-desktop-for-udacity-497bdd91a505) for students. 
-
 ## ncurses
 [ncurses](https://www.gnu.org/software/ncurses/) is a library that facilitates text-based graphical output in the terminal. This project relies on ncurses for display output.
 
