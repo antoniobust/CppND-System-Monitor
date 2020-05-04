@@ -1,6 +1,6 @@
 # System-Monitor
 
-System Monitor is part of the secon [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213) Assigment 
+System Monitor is part of the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213) (Second Assignment) 
 
 ![System Monitor](images/monitor.png)
 
