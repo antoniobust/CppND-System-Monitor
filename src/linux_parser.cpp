@@ -2,12 +2,13 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <filesystem>
+
 
 #include "linux_parser.h"
 
 using std::stof;
 using std::string;
-using std::to_string;
 using std::vector;
 
 // DONE: An example of how to read data from the filesystem
@@ -66,7 +67,6 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() {
   string line,label, tot, free;
   std::ifstream fs(kProcDirectory + kMeminfoFilename);
@@ -102,7 +102,18 @@ long LinuxParser::IdleJiffies() { return 0; }
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
 // TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
+int LinuxParser::TotalProcesses() { 
+  int tot_p = 0;
+  std::filesystem::path proc = kProcDirectory;
+  for( auto &f : std::filesystem::directory_iterator(proc)){
+    if(f.is_directory()){
+      if(LinuxParser::IsProcess(f)){
+        tot_p ++;
+      }
+    }
+  }
+  return tot_p; 
+}
 
 // TODO: Read and return the number of running processes
 int LinuxParser::RunningProcesses() { return 0; }
@@ -126,3 +137,8 @@ string LinuxParser::User(int pid[[maybe_unused]]) { return string(); }
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::UpTime(int pid[[maybe_unused]]) { return 0; }
+
+bool LinuxParser::IsProcess(std::filesystem::directory_entry d){
+  string name = d.path().filename();
+  return name.find_first_not_of ("0123456789") > name.length();
+}

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <regex>
 #include <string>
+#include  <filesystem>
 
 namespace LinuxParser {
 // Paths
@@ -24,6 +25,7 @@ long UpTime();
 std::vector<int> Pids();
 int TotalProcesses();
 int RunningProcesses();
+bool IsProcess(std::filesystem::directory_entry p);
 std::string OperatingSystem();
 std::string Kernel();
 
