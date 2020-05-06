@@ -1,11 +1,14 @@
-#include <string>
-
 #include "format.h"
+
+#include <cstdlib>
+#include <string>
 
 using std::string;
 
-// TODO: Complete this helper function
-// INPUT: Long int measuring seconds
-// OUTPUT: HH:MM:SS
-// REMOVE: [[maybe_unused]] once you define the function
-string Format::ElapsedTime(long seconds[[maybe_unused]]) { return string(); }
+string Format::ElapsedTime(long seconds) {
+  int hours, minutes;
+  minutes = seconds / 60;
+  hours = minutes / 60;
+  return std::to_string(hours) + "h " + std::to_string(minutes % 60) + "m " +
+         std::to_string(int(seconds % 60)) + "s ";
+}

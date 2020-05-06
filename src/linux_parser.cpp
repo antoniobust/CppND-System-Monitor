@@ -83,7 +83,18 @@ float LinuxParser::MemoryUtilization() {
   return (std::stof(tot) - std::stof(free)) / std::stof(tot);
 }
 // TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+long LinuxParser::UpTime() {
+  std::ifstream fs(kProcDirectory + kUptimeFilename);
+  if(!fs.is_open()){
+    return 0;
+  } 
+  string up_time, line;
+  getline(fs,line);
+  std::istringstream s_stream(line);
+  s_stream >> up_time; 
+  long int a = std::stol(up_time); 
+  return a;
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
