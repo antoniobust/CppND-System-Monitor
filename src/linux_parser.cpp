@@ -66,7 +66,7 @@ vector<int> LinuxParser::Pids() {
 }
 
 float LinuxParser::MemoryUtilization() {
-  string line, label, tot, free;
+  string line, label, tot, free, buffers;
   std::ifstream fs(kProcDirectory + kMeminfoFilename);
   if (!fs.is_open()) {
     return 0.0;
@@ -78,7 +78,12 @@ float LinuxParser::MemoryUtilization() {
   std::getline(fs, line);
   s_stream.str(line);
   s_stream >> label >> free;
-  return (std::stof(tot) - std::stof(free)) / std::stof(tot);
+  std::getline(fs, line);
+  std::getline(fs, line);
+  s_stream.str(line);
+  s_stream >> label >> buffers;
+  
+  return  1.0 - (std::stof(free)/ ( std::stof(tot) - std::stof(buffers)));
 }
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() {
