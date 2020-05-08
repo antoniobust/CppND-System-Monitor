@@ -1,4 +1,5 @@
 #include "linux_parser.h"
+#include "processor.h"
 
 #include <dirent.h>
 #include <unistd.h>
@@ -82,8 +83,8 @@ float LinuxParser::MemoryUtilization() {
   std::getline(fs, line);
   s_stream.str(line);
   s_stream >> label >> buffers;
-  
-  return  1.0 - (std::stof(free)/ ( std::stof(tot) - std::stof(buffers)));
+
+  return 1.0 - (std::stof(free) / (std::stof(tot) - std::stof(buffers)));
 }
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() {
@@ -111,6 +112,24 @@ long LinuxParser::ActiveJiffies() { return 0; }
 
 // TODO: Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies() { return 0; }
+
+void LinuxParser::SystemCpus(std::vector<Processor> &cpus) {
+  std::ifstream fs(kProcDirectory + kStatFilename);
+  if (!fs.is_open()) {
+    return;
+  }
+  std::string line, label;
+  std::istringstream s_stream;
+  while(getline(fs, line)){
+    s_stream.str(line);
+    s_stream >> label; 
+    if(!label.find("cpu", 0)){
+      break;
+    } else {
+      cpus.push_back(Processor(label.c_str()));
+    }
+  }
+}
 
 // TODO: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() { return {}; }

@@ -5,12 +5,13 @@
 
 class Processor {
  public:
+  Processor(const char *id);
   float Utilization();
   std::string CpuId();
 
   // TODO: Declare any necessary private members
  private:
-    std::string cpuId_ = "PROCESSOR";
+    std::string cpuId_;
     float utilization_ = 0.0;
 };
 

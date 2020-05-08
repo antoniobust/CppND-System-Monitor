@@ -6,6 +6,8 @@
 #include <string>
 #include  <filesystem>
 
+#include "processor.h"
+
 namespace LinuxParser {
 // Paths
 const std::string kProcDirectory{"/proc/"};
@@ -42,6 +44,7 @@ enum CPUStates {
   kGuest_,
   kGuestNice_
 };
+void SystemCpus(std::vector<Processor> &cpus);
 std::vector<std::string> CpuUtilization();
 long Jiffies();
 long ActiveJiffies();

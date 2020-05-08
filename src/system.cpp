@@ -16,12 +16,11 @@ using std::size_t;
 using std::string;
 using std::vector;
 
-System::System(){
-    cpus_.push_back(Processor());
-    cpus_.push_back(Processor());
-        cpus_.push_back(Processor());
-    cpus_.push_back(Processor());
-
+System::System() {
+  cpus_.push_back(Processor("cpu1"));
+  cpus_.push_back(Processor("cpu2"));
+  cpus_.push_back(Processor("cpu3"));
+  cpus_.push_back(Processor("cpu4"));
 }
 
 // TODO: Return the system's CPU
@@ -39,9 +38,7 @@ float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
 // TODO: Return the operating system name
 std::string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
 
-int System::RunningProcesses() { 
-    return LinuxParser::RunningProcesses();
- }
+int System::RunningProcesses() { return LinuxParser::RunningProcesses(); }
 
 // TODO: Return the total number of processes on the system
 int System::TotalProcesses() { return LinuxParser::TotalProcesses(); }
