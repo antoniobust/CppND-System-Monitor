@@ -1,11 +1,13 @@
+#include "ncurses_display.h"
+
 #include <curses.h>
+
 #include <chrono>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include "format.h"
-#include "ncurses_display.h"
 #include "system.h"
 
 using std::string;
@@ -35,7 +37,9 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   mvwprintw(window, ++row, 2, "CPU: ");
   wattron(window, COLOR_PAIR(1));
   mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(system.Cpu().Utilization()).c_str());
+  for (Processor &p : system.Cpu()) {
+    wprintw(window, ProgressBar(p.Utilization()).c_str());
+  }
   wattroff(window, COLOR_PAIR(1));
   mvwprintw(window, ++row, 2, "Memory: ");
   wattron(window, COLOR_PAIR(1));
