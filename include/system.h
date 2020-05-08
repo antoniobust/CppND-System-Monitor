@@ -9,7 +9,7 @@
 
 class System {
  public:
-  std::vector<Processor>& Cpu();                   // TODO: See src/system.cpp
+  std::vector<Processor>& Cpus();                   // TODO: See src/system.cpp
   std::vector<Process>& Processes();  // TODO: See src/system.cpp
   float MemoryUtilization();
   long UpTime();                      // TODO: See src/system.cpp
@@ -19,7 +19,7 @@ class System {
   std::string OperatingSystem();      // TODO: See src/system.cpp
 
  private:
-  std::vector<Processor> cpu_ = {};
+  std::vector<Processor> cpus_ = {};
   std::vector<Process> processes_ = {};
 };
 

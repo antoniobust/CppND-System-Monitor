@@ -34,10 +34,10 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   int row{0};
   mvwprintw(window, ++row, 2, ("OS: " + system.OperatingSystem()).c_str());
   mvwprintw(window, ++row, 2, ("Kernel: " + system.Kernel()).c_str());
-  mvwprintw(window, ++row, 2, "CPU: ");
-  wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, row, 10, "");
-  for (Processor &p : system.Cpu()) {
+  for (Processor &p : system.Cpus()) {
+    mvwprintw(window, ++row, 2, "CPU: ");
+    wattron(window, COLOR_PAIR(1));
+    mvwprintw(window, row, 10, "");
     wprintw(window, ProgressBar(p.Utilization()).c_str());
   }
   wattroff(window, COLOR_PAIR(1));
