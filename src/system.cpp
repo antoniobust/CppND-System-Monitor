@@ -16,6 +16,14 @@ using std::size_t;
 using std::string;
 using std::vector;
 
+System::System(){
+    cpus_.push_back(Processor());
+    cpus_.push_back(Processor());
+        cpus_.push_back(Processor());
+    cpus_.push_back(Processor());
+
+}
+
 // TODO: Return the system's CPU
 std::vector<Processor>& System::Cpus() { return cpus_; }
 
