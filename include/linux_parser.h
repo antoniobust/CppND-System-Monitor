@@ -4,10 +4,9 @@
 #include <fstream>
 #include <regex>
 #include <string>
+#include <vector>
 #include  <filesystem>
-
 #include "processor.h"
-
 namespace LinuxParser {
 // Paths
 const std::string kProcDirectory{"/proc/"};
@@ -33,7 +32,7 @@ std::string Kernel();
 
 // CPU
 enum CPUStates {
-  kUser_ = 0,
+  kUser_= 0 ,
   kNice_,
   kSystem_,
   kIdle_,
@@ -44,8 +43,8 @@ enum CPUStates {
   kGuest_,
   kGuestNice_
 };
-void SystemCpus(std::vector<Processor> &cpus);
-std::vector<std::string> CpuUtilization();
+std::vector<std::string> SystemCpus();
+std::vector<std::string> CpuUtilization(std::string id) ;
 long Jiffies();
 long ActiveJiffies();
 long ActiveJiffies(int pid);

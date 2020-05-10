@@ -1,9 +1,6 @@
 #include "linux_parser.h"
-#include "processor.h"
-
 #include <dirent.h>
 #include <unistd.h>
-
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -113,26 +110,48 @@ long LinuxParser::ActiveJiffies() { return 0; }
 // TODO: Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies() { return 0; }
 
-void LinuxParser::SystemCpus(std::vector<Processor> &cpus) {
-  std::ifstream fs(kProcDirectory + kStatFilename);
+vector<string> LinuxParser::SystemCpus() {
+  std::ifstream fs(LinuxParser::kProcDirectory + LinuxParser::kStatFilename);
   if (!fs.is_open()) {
-    return;
+    return {};
   }
   std::string line, label;
   std::istringstream s_stream;
-  while(getline(fs, line)){
+  std::vector<std::string> cpus;
+  while (getline(fs, line)) {
     s_stream.str(line);
-    s_stream >> label; 
-    if(!label.find("cpu", 0)){
-      break;
+    s_stream >> label;
+    if (label.find("cpu", 0)) {
+      return cpus;
     } else {
-      cpus.push_back(Processor(label.c_str()));
+      cpus.push_back(label);
     }
   }
+  return cpus;
 }
 
-// TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+vector<string> LinuxParser::CpuUtilization(std::string id) {
+  std::ifstream fs(kProcDirectory + kStatFilename);
+  if (!fs.is_open()) {
+    return {};
+  }
+  std::string line;
+  while (std::getline(fs, line)) {
+    if (line.find(id)!=string::npos) {
+      std::istringstream s_stream(line);
+      std::vector<string> c_usage;
+      std::string val;
+      s_stream >> val;  //skip first stream (cpu id);
+      while (!s_stream.eof()) {
+        s_stream >> val;
+        c_usage.push_back(val);
+      }
+      return c_usage;
+    }
+  }
+
+  return {};
+}
 
 int LinuxParser::TotalProcesses() {
   int tot_p = 0;

@@ -1,15 +1,9 @@
-#include "system.h"
+#include "../include/system.h"
 
 #include <unistd.h>
 
 #include <cstddef>
 #include <set>
-#include <string>
-#include <vector>
-
-#include "linux_parser.h"
-#include "process.h"
-#include "processor.h"
 
 using std::set;
 using std::size_t;
@@ -17,14 +11,19 @@ using std::string;
 using std::vector;
 
 System::System() {
-  cpus_.push_back(Processor("cpu1"));
-  cpus_.push_back(Processor("cpu2"));
-  cpus_.push_back(Processor("cpu3"));
-  cpus_.push_back(Processor("cpu4"));
+std::vector<std::string> cpus = LinuxParser::SystemCpus();
+  for (auto c : cpus) {
+    cpus_.push_back(Processor(c.c_str()));
+  }
 }
 
 // TODO: Return the system's CPU
-std::vector<Processor>& System::Cpus() { return cpus_; }
+vector<Processor>& System::Cpus() {
+  for (auto p : cpus_) {
+    LinuxParser::CpuUtilization(p.CpuId());
+  }
+  return cpus_;
+}
 
 // TODO: Return a container composed of the system's processes
 vector<Process>& System::Processes() { return processes_; }
