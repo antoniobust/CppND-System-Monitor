@@ -31,6 +31,7 @@ string LinuxParser::OperatingSystem() {
   return value;
 }
 
+
 string LinuxParser::Kernel() {
   string os, kernel;
   string line;
@@ -43,7 +44,6 @@ string LinuxParser::Kernel() {
   return kernel;
 }
 
-// BONUS: Update this to use std::filesystem
 vector<int> LinuxParser::Pids() {
   vector<int> pids;
   DIR* directory = opendir(kProcDirectory.c_str());
@@ -83,7 +83,6 @@ float LinuxParser::MemoryUtilization() {
 
   return 1.0 - (std::stof(free) / (std::stof(tot) - std::stof(buffers)));
 }
-// TODO: Read and return the system uptime
 long LinuxParser::UpTime() {
   std::ifstream fs(kProcDirectory + kUptimeFilename);
   if (!fs.is_open()) {
@@ -166,7 +165,6 @@ int LinuxParser::TotalProcesses() {
   return tot_p;
 }
 
-// TODO: Read and return the number of running processes
 int LinuxParser::RunningProcesses() {
   std::ifstream fs(kProcDirectory + kStatFilename);
   string line, procs_running("procs_running"), ps = "0";
