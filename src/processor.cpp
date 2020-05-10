@@ -2,7 +2,6 @@
 
 Processor::Processor(const char *id) { cpuId_.assign(id); }
 
-// TODO: Return the aggregate CPU utilization
 float Processor::Utilization() {
   Processor::MeterRead();
   return this->utilization_;
