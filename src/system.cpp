@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <set>
+#include "process.h"
 
 using std::set;
 using std::size_t;
@@ -28,10 +29,12 @@ vector<Processor>& System::Cpus() {
 }
 
 vector<Process>& System::Processes() {
-   std::vector<int> c_pids  = LinuxParser::Pids();
-   for(auto p : c_pids){
-     pro
-   }
+  std::vector<int> c_pids = LinuxParser::Pids();
+  for (int& p : c_pids) {
+    Process proc = Process();
+    proc.Pid(p);
+    processes_.push_back(proc);
+  }
   return processes_;
 }
 

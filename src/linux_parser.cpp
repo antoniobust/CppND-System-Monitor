@@ -1,6 +1,8 @@
 #include "linux_parser.h"
+
 #include <dirent.h>
 #include <unistd.h>
+
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -31,7 +33,6 @@ string LinuxParser::OperatingSystem() {
   return value;
 }
 
-
 string LinuxParser::Kernel() {
   string os, kernel;
   string line;
@@ -46,20 +47,12 @@ string LinuxParser::Kernel() {
 
 vector<int> LinuxParser::Pids() {
   vector<int> pids;
-  DIR* directory = opendir(kProcDirectory.c_str());
-  struct dirent* file;
-  while ((file = readdir(directory)) != nullptr) {
-    // Is this a directory?
-    if (file->d_type == DT_DIR) {
-      // Is every character of the name a digit?
-      string filename(file->d_name);
-      if (std::all_of(filename.begin(), filename.end(), isdigit)) {
-        int pid = stoi(filename);
-        pids.push_back(pid);
-      }
+  std::filesystem::path proc = kProcDirectory;
+  for (auto& f : std::filesystem::directory_iterator(proc)) {
+    if (f.is_directory() && LinuxParser::IsProcess(f)) {
+      pids.push_back(std::stoi(f.path().filename()));
     }
   }
-  closedir(directory);
   return pids;
 }
 
@@ -136,11 +129,11 @@ vector<string> LinuxParser::CpuUtilization(std::string id) {
   }
   std::string line;
   while (std::getline(fs, line)) {
-    if (line.find(id)!=string::npos) {
+    if (line.find(id) != string::npos) {
       std::istringstream s_stream(line);
       std::vector<string> c_usage;
       std::string val;
-      s_stream >> val;  //skip first stream (cpu id);
+      s_stream >> val;  // skip first stream (cpu id);
       while (!s_stream.eof()) {
         s_stream >> val;
         c_usage.push_back(val);
