@@ -11,13 +11,13 @@ using std::string;
 using std::vector;
 
 System::System() {
-std::vector<std::string> cpus = LinuxParser::SystemCpus();
+  std::vector<std::string> cpus = LinuxParser::SystemCpus();
   for (auto c : cpus) {
     cpus_.push_back(Processor(c.c_str()));
   }
-//Assign non changing properties here 
- kernel.assign(Kernel_());
- OS.assign(OperatingSystem_());
+  // Assign non changing properties here
+  kernel.assign(Kernel_());
+  OS.assign(OperatingSystem_());
 }
 
 vector<Processor>& System::Cpus() {
@@ -27,8 +27,12 @@ vector<Processor>& System::Cpus() {
   return cpus_;
 }
 
-vector<Process>& System::Processes() { 
-  return processes_; 
+vector<Process>& System::Processes() {
+   std::vector<int> c_pids  = LinuxParser::Pids();
+   for(auto p : c_pids){
+     pro
+   }
+  return processes_;
 }
 
 std::string System::Kernel_() { return LinuxParser::Kernel(); }
@@ -39,7 +43,9 @@ float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
 
 std::string System::OperatingSystem() { return this->OS; }
 
-std::string System::OperatingSystem_() { return LinuxParser::OperatingSystem(); }
+std::string System::OperatingSystem_() {
+  return LinuxParser::OperatingSystem();
+}
 
 int System::RunningProcesses() { return LinuxParser::RunningProcesses(); }
 

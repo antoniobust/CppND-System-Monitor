@@ -3,19 +3,28 @@
 
 #include <string>
 
-
 class Process {
  public:
-  int Pid();                               // TODO: See src/process.cpp
-  std::string User();                      // TODO: See src/process.cpp
-  std::string Command();                   // TODO: See src/process.cpp
-  float CpuUtilization();                  // TODO: See src/process.cpp
-  std::string Ram();                       // TODO: See src/process.cpp
-  long int UpTime();                       // TODO: See src/process.cpp
-  bool operator<(Process const& a) const;  // TODO: See src/process.cpp
+  Process();
+  int Pid();
+  std::string User();
+  std::string Command();
+  float CpuUtilization();
+  std::string Ram();
+  long int UpTime();
+  bool operator<(Process const& a) const;
+  int Pid(int p);
+  std::string User(const char* u);
+  std::string Command(const char* c);
+  float CpuUtilization(float c_u);
+  std::string Ram(const char* r);
+  long int UpTime(long int u_t);
 
-  // TODO: Declare any necessary private members
  private:
+  int pid_ = 0;
+  long int upTime_ = 0;
+  std::string ram_, user_, command_;
+  float cpuUtilization_;
 };
 
 #endif
