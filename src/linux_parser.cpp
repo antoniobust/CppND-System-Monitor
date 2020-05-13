@@ -1,6 +1,7 @@
 #include "linux_parser.h"
 
 #include <dirent.h>
+#include <unistd.h>
 
 #include <cstring>
 #include <filesystem>
@@ -90,13 +91,25 @@ long LinuxParser::UpTime() {
   return a;
 }
 
-// TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+long LinuxParser::Jiffies() { return sysconf(_SC_CLK_TCK) * UpTime(); }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid [[maybe_unused]]) { return 0; }
+long LinuxParser::ActiveJiffies(int pid) {
+  std::ifstream fs(kProcDirectory + std::to_string(pid) + kStatusFilename);
+  if (!fs.is_open()) {
+    return -1;
+  }
+  string line;
+  string utime, stime, cutime, cstime;
 
+  std::getline(fs, line);
+  std::istringstream s_stream(line);
+  s_stream.seekg(13);
+  s_stream >> utime >> stime >> cutime >> cstime;
+  return std::stol(utime) + std::stol(stime) + std::stol(cutime) +
+         std::stol(cstime);
+}
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() { return 0; }
 
