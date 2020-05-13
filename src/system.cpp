@@ -36,6 +36,7 @@ vector<Process>& System::Processes() {
     proc = Process();
     proc.Pid(p);
     proc.User(LinuxParser::User(p).c_str());
+    proc.Command(LinuxParser::Command(p).c_str());
     processes_.push_back(proc);
   }
   return processes_;

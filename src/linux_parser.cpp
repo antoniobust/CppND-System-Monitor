@@ -176,9 +176,15 @@ int LinuxParser::RunningProcesses() {
   return std::stoi(ps);
 }
 
-// TODO: Read and return the command associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Command(int pid) {
+  std::ifstream fs(kProcDirectory + std::to_string(pid) + kCmdlineFilename);
+  if (!fs.is_open()) {
+    return "";
+  }
+  string line, cmd;
+  std::getline(fs, line);
+  return line;
+}
 
 // TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
@@ -189,10 +195,10 @@ string LinuxParser::Uid(int pid) {
   if (!fs.is_open()) {
     return string();
   }
-  string line,uid;
+  string line, uid;
   std::istringstream s_stream;
-  while(std::getline(fs, line)){
-    if(line.find("Uid",0)!= string::npos){
+  while (std::getline(fs, line)) {
+    if (line.find("Uid", 0) != string::npos) {
       s_stream.clear();
       s_stream.str(line);
       s_stream >> uid >> uid;
