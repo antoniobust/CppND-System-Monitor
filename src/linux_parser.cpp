@@ -109,7 +109,6 @@ long LinuxParser::ActiveJiffies(int pid) {
          std::stol(cstime);
 }
 
-// TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() {
   std::ifstream fs(kProcDirectory + kStatFilename);
   if (!fs.is_open()) {
@@ -128,8 +127,18 @@ long LinuxParser::ActiveJiffies() {
          std::stol(guestNice);
 }
 
-// TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+long LinuxParser::IdleJiffies() {
+  std::ifstream fs(kProcDirectory + kStatFilename);
+  if (!fs.is_open()) {
+    return 0;
+  }
+  std::string line, idle, iowait;
+  std::getline(fs, line);
+  std::istringstream s_stream(line);
+  s_stream.seekg(3) >> idle >> iowait;
+
+  return std::stol(idle) + std::stol(iowait);
+}
 
 vector<string> LinuxParser::SystemCpus() {
   std::ifstream fs(LinuxParser::kProcDirectory + LinuxParser::kStatFilename);
