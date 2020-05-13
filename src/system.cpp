@@ -30,9 +30,12 @@ vector<Processor>& System::Cpus() {
 
 vector<Process>& System::Processes() {
   std::vector<int> c_pids = LinuxParser::Pids();
+  Process proc;
+
   for (int& p : c_pids) {
-    Process proc = Process();
+    proc = Process();
     proc.Pid(p);
+    proc.User(LinuxParser::User(p).c_str());
     processes_.push_back(proc);
   }
   return processes_;

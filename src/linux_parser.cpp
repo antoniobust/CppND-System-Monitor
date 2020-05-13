@@ -1,8 +1,8 @@
 #include "linux_parser.h"
 
 #include <dirent.h>
-#include <unistd.h>
 
+#include <cstring>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -76,6 +76,7 @@ float LinuxParser::MemoryUtilization() {
 
   return 1.0 - (std::stof(free) / (std::stof(tot) - std::stof(buffers)));
 }
+
 long LinuxParser::UpTime() {
   std::ifstream fs(kProcDirectory + kUptimeFilename);
   if (!fs.is_open()) {
@@ -183,13 +184,45 @@ string LinuxParser::Command(int pid [[maybe_unused]]) { return string(); }
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Ram(int pid [[maybe_unused]]) { return string(); }
 
-// TODO: Read and return the user ID associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Uid(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Uid(int pid) {
+  std::ifstream fs(kProcDirectory + std::to_string(pid) + kStatusFilename);
+  if (!fs.is_open()) {
+    return string();
+  }
+  string line,uid;
+  std::istringstream s_stream;
+  while(std::getline(fs, line)){
+    if(line.find("Uid",0)!= string::npos){
+      s_stream.clear();
+      s_stream.str(line);
+      s_stream >> uid >> uid;
+      return uid;
+    }
+  }
+  return line;
+}
 
-// TODO: Read and return the user associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::User(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::User(int pid) {
+  string uid = LinuxParser::Uid(pid);
+  std::ifstream fs(kPasswordPath);
+  if (!fs.is_open()) {
+    return "";
+  }
+  string line;
+  string user, userId, pwd;
+  std::istringstream s_stream;
+  while (std::getline(fs, line)) {
+    s_stream.clear();
+    s_stream.str(line);
+    std::getline(s_stream, user, ':');
+    std::getline(s_stream, pwd, ':');
+    std::getline(s_stream, userId, ':');
+    if (uid.compare(userId) == 0) {
+      return user;
+    }
+  }
+  return string();
+}
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
