@@ -60,12 +60,12 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
 void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
                                       WINDOW* window, int n) {
   int row{0};
-  int const pid_column{2};
-  int const user_column{9};
-  int const cpu_column{16};
-  int const ram_column{26};
-  int const time_column{35};
-  int const command_column{46};
+  int const pid_column{3};
+  int const user_column{12};
+  int const cpu_column{24};
+  int const ram_column{32};
+  int const time_column{42};
+  int const command_column{64};
   wattron(window, COLOR_PAIR(2));
   mvwprintw(window, ++row, pid_column, "PID");
   mvwprintw(window, row, user_column, "USER");
@@ -94,7 +94,7 @@ void NCursesDisplay::Display(System& system, int n) {
   start_color();  // enable color
 
   int x_max{getmaxx(stdscr)};
-  WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
+  WINDOW* system_window = newwin(11, x_max - 1, 0, 0);
   WINDOW* process_window =
       newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
 

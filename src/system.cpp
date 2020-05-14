@@ -37,8 +37,10 @@ vector<Process>& System::Processes() {
     proc.Pid(p);
     proc.User(LinuxParser::User(p).c_str());
     proc.Command(LinuxParser::Command(p).c_str());
+    proc.UpTime(LinuxParser::UpTime(p));
     processes_.push_back(proc);
   }
+  std::sort(processes_.begin(),processes_.end());
   return processes_;
 }
 

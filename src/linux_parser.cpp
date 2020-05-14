@@ -103,8 +103,7 @@ long LinuxParser::ActiveJiffies(int pid) {
 
   std::getline(fs, line);
   std::istringstream s_stream(line);
-  s_stream.seekg(13);
-  s_stream >> utime >> stime >> cutime >> cstime;
+  s_stream.seekg(13) >> utime >> stime >> cutime >> cstime;
   return std::stol(utime) + std::stol(stime) + std::stol(cutime) +
          std::stol(cstime);
 }
@@ -220,7 +219,10 @@ string LinuxParser::Command(int pid) {
   }
   string line, cmd;
   std::getline(fs, line);
-  return line;
+  std::istringstream s_stream(line);
+  //get only the command, ignore the flags (long strings mess up with display)
+  s_stream >> cmd;
+  return cmd;
 }
 
 // TODO: Read and return the memory used by a process
@@ -267,9 +269,28 @@ string LinuxParser::User(int pid) {
   return string();
 }
 
-// TODO: Read and return the uptime of a process
-// REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid [[maybe_unused]]) { return 0; }
+long LinuxParser::UpTime(int pid) {
+  std::ifstream fs(kProcDirectory + std::to_string(pid) + kStatFilename);
+  if (!fs.is_open()) {
+    return 0;
+  }
+  std::string line, major, minor;
+  std::getline(fs, line);
+  std::istringstream bufLine(line);
+  std::istream_iterator<string> beginning(bufLine), end;
+  std::vector<string> values(beginning, end);
+
+  std::istringstream s_stream(Kernel());
+  std::getline(s_stream, major, '.');
+  std::getline(s_stream, minor, '.');
+
+  if (std::stoi(major) == 2 && std::stoi(minor) == 6) {
+    return Jiffies() - std::stof(values[22])/sysconf(_SC_CLK_TCK); 
+  } else {
+    return UpTime() - std::stof(values[22])/sysconf(_SC_CLK_TCK);
+  }
+  return 0;
+}
 
 bool LinuxParser::IsProcess(std::filesystem::directory_entry d) {
   string name = d.path().filename();
