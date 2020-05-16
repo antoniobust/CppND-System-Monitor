@@ -3,7 +3,9 @@
 #include <unistd.h>
 
 #include <cctype>
+#include <chrono>
 #include <sstream>
+#include <thread>
 #include <vector>
 
 #include "system.h"
@@ -34,38 +36,25 @@ string Process::User() { return user_; }
 long int Process::UpTime() { return upTime_; }
 
 bool Process::operator<(Process const& a) const {
-  return this->cpuUtilization_ < a.cpuUtilization_;
+  return a.cpuUtilization_ < this->cpuUtilization_;
 }
 
 void Process::Pid_(int p) { pid_ = p; }
 void Process::User_(const char* u) { user_ = std::string(u); }
 void Process::Command_(const char* c) { command_ = std::string(c); }
 void Process::CpuUtilization_() {
-  if (!System::IsModernLinux()) {
-    long c_Jiffies = LinuxParser::ActiveJiffies(this->pid_);
-    long c_totJiffies =
-        LinuxParser::ActiveJiffies() + LinuxParser::IdleJiffies();
-    cpuUtilization_ =
-        (float)(c_Jiffies - this->jiffies) / (c_totJiffies - this->totJiffies);
-    this->totJiffies = c_totJiffies;
-    this->jiffies = c_Jiffies;
-  } else {
-    long total_time = LinuxParser::ActiveJiffies(pid_);
-    long seconds = this->Process::UpTime();
-    long total_time_seconds = total_time / sysconf(_SC_CLK_TCK);
-    cpuUtilization_ = (float)total_time_seconds / seconds;
-    // long total_time = LinuxParser::ActiveJiffies(pid_);
-    // long c_seconds = UpTime();
-    // long c_total_time_seconds = total_time / sysconf(_SC_CLK_TCK);
-    // long delta_total = c_total_time_seconds - total_time_seconds_;
-    // long delta_seconds = c_seconds - seconds_;
-    // total_time_seconds_ = c_total_time_seconds;
-    // seconds_ = c_seconds;
-    // cpuUtilization_ = (float)delta_total / delta_seconds;
-  }
+  long proc_t_time = LinuxParser::ActiveJiffies(pid_) / sysconf(_SC_CLK_TCK);
+  cpuUtilization_ = (float)proc_t_time / this->upTime_;
 }
 void Process::Ram_(const char* r) {
   std::string ram(r);
   ram_ = std::to_string(std::stoi(ram) / 1024);
 }
-void Process::UpTime_(long int u_t) { upTime_ = u_t; }
+void Process::UpTime_(long int u_t) {
+  if (!System::IsModernLinux()) {
+    upTime_ = (LinuxParser::Jiffies() / sysconf(_SC_CLK_TCK)) -
+              u_t / sysconf(_SC_CLK_TCK);
+  } else {
+    upTime_ = LinuxParser::UpTime() - u_t / sysconf(_SC_CLK_TCK);
+  }
+}

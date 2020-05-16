@@ -44,6 +44,7 @@ vector<Processor>& System::Cpus() {
 
 vector<Process>& System::Processes() {
   std::vector<int> c_pids = LinuxParser::Pids();
+  processes_.clear();
 
   for (int& p : c_pids) {
     Process proc = Process(p);

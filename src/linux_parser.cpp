@@ -139,7 +139,7 @@ long LinuxParser::IdleJiffies() {
   std::istream_iterator<string> beginning(bufLine), end;
   std::vector<string> values(beginning, end);
 
-  return std::stol(values[4]) + std::stol(values[4]);
+  return std::stol(values[4]) + std::stol(values[5]);
 }
 
 vector<string> LinuxParser::SystemCpus() {
@@ -300,12 +300,7 @@ long LinuxParser::UpTime(int pid) {
   std::istream_iterator<string> beginning(bufLine), end;
   std::vector<string> values(beginning, end);
 
-  if (!System::IsModernLinux()) {
-    return Jiffies() - std::stof(values[22]) / sysconf(_SC_CLK_TCK);
-  } else {
-    return UpTime() - std::stof(values[22]) / sysconf(_SC_CLK_TCK);
-  }
-  return 0;
+  return std::stol(values[21]);
 }
 
 bool LinuxParser::IsProcess(std::filesystem::directory_entry d) {
