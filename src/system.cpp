@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <set>
+
 #include "process.h"
 
 using std::set;
@@ -21,6 +22,19 @@ System::System() {
   OS.assign(OperatingSystem_());
 }
 
+bool System::IsModernLinux() {
+  string minor, major;
+  std::istringstream s_stream(LinuxParser::Kernel());
+  std::getline(s_stream, major, '.');
+  std::getline(s_stream, minor, '.');
+
+  if (std::stoi(major) == 2 && std::stoi(minor) == 6) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 vector<Processor>& System::Cpus() {
   for (auto p : cpus_) {
     LinuxParser::CpuUtilization(p.CpuId());
@@ -30,17 +44,12 @@ vector<Processor>& System::Cpus() {
 
 vector<Process>& System::Processes() {
   std::vector<int> c_pids = LinuxParser::Pids();
-  Process proc;
 
   for (int& p : c_pids) {
-    proc = Process();
-    proc.Pid(p);
-    proc.User(LinuxParser::User(p).c_str());
-    proc.Command(LinuxParser::Command(p).c_str());
-    proc.UpTime(LinuxParser::UpTime(p));
+    Process proc = Process(p);
     processes_.push_back(proc);
   }
-  std::sort(processes_.begin(),processes_.end());
+  std::sort(processes_.begin(), processes_.end());
   return processes_;
 }
 

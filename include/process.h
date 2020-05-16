@@ -2,9 +2,11 @@
 #define PROCESS_H
 
 #include <string>
+#include "linux_parser.h"
 
 class Process {
  public:
+  Process(int pid);
   int Pid();
   std::string User();
   std::string Command();
@@ -12,18 +14,20 @@ class Process {
   std::string Ram();
   long int UpTime();
   bool operator<(Process const& a) const;
-  void Pid(int p);
-  void User(const char* u);
-  void Command(const char* c);
-  void CpuUtilization(float c_u);
-  void Ram(const char* r);
-  void UpTime(long int u_t);
+  
 
  private:
   int pid_=0;
+  long totJiffies = 0, jiffies = 0, seconds_,total_time_seconds_;
   long int upTime_=0;
   std::string ram_, user_, command_;
   float cpuUtilization_=(float)0;
+  void Pid_(int p);
+  void User_(const char* u);
+  void Command_(const char* c);
+  void CpuUtilization_();
+  void Ram_(const char* r);
+  void UpTime_(long int u_t);
 };
 
 #endif

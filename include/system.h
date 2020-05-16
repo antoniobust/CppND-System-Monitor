@@ -19,6 +19,7 @@ class System {
   int RunningProcesses();
   std::string Kernel();
   std::string OperatingSystem();
+  static bool IsModernLinux();
 
  private:
   std::string kernel, OS;

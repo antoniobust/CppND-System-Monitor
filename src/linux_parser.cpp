@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include "system.h"
+
 using std::stof;
 using std::string;
 using std::vector;
@@ -94,7 +96,7 @@ long LinuxParser::UpTime() {
 long LinuxParser::Jiffies() { return sysconf(_SC_CLK_TCK) * UpTime(); }
 
 long LinuxParser::ActiveJiffies(int pid) {
-  std::ifstream fs(kProcDirectory + std::to_string(pid) + kStatusFilename);
+  std::ifstream fs(kProcDirectory + std::to_string(pid) + kStatFilename);
   if (!fs.is_open()) {
     return -1;
   }
@@ -102,10 +104,11 @@ long LinuxParser::ActiveJiffies(int pid) {
   string utime, stime, cutime, cstime;
 
   std::getline(fs, line);
-  std::istringstream s_stream(line);
-  s_stream.seekg(13) >> utime >> stime >> cutime >> cstime;
-  return std::stol(utime) + std::stol(stime) + std::stol(cutime) +
-         std::stol(cstime);
+  std::istringstream bufLine(line);
+  std::istream_iterator<string> beginning(bufLine), end;
+  std::vector<string> values(beginning, end);
+  return std::stol(values[13]) + std::stol(values[14]) + std::stol(values[15]) +
+         std::stol(values[16]);
 }
 
 long LinuxParser::ActiveJiffies() {
@@ -113,17 +116,16 @@ long LinuxParser::ActiveJiffies() {
   if (!fs.is_open()) {
     return 0;
   }
-  std::string line, user, nice, system, idle, iowait, irq, softirq, steal,
-      guest, guestNice;
+  string line;
   std::getline(fs, line);
   std::istringstream s_stream(line);
-  s_stream.seekg(1) >> user >> nice >> system >> idle >> iowait >> irq >>
-      softirq >> steal >> guest >> guestNice;
-
-  return std::stol(user) + std::stol(nice) + std::stol(system) +
-         std::stol(idle) + std::stol(iowait) + std::stol(irq) +
-         std::stol(softirq) + std::stol(steal) + std::stol(guest) +
-         std::stol(guestNice);
+  std::istringstream bufLine(line);
+  std::istream_iterator<string> beginning(bufLine), end;
+  std::vector<string> values(beginning, end);
+  return std::stol(values[1]) + std::stol(values[2]) + std::stol(values[3]) +
+         std::stol(values[4]) + std::stol(values[5]) + std::stol(values[5]) +
+         std::stol(values[7]) + std::stol(values[8]) + std::stol(values[9]) +
+         std::stol(values[10]);
 }
 
 long LinuxParser::IdleJiffies() {
@@ -131,12 +133,13 @@ long LinuxParser::IdleJiffies() {
   if (!fs.is_open()) {
     return 0;
   }
-  std::string line, idle, iowait;
+  string line;
   std::getline(fs, line);
-  std::istringstream s_stream(line);
-  s_stream.seekg(3) >> idle >> iowait;
+  std::istringstream bufLine(line);
+  std::istream_iterator<string> beginning(bufLine), end;
+  std::vector<string> values(beginning, end);
 
-  return std::stol(idle) + std::stol(iowait);
+  return std::stol(values[4]) + std::stol(values[4]);
 }
 
 vector<string> LinuxParser::SystemCpus() {
@@ -220,14 +223,28 @@ string LinuxParser::Command(int pid) {
   string line, cmd;
   std::getline(fs, line);
   std::istringstream s_stream(line);
-  //get only the command, ignore the flags (long strings mess up with display)
+  // get only the command, ignore the flags (long strings mess up with display)
   s_stream >> cmd;
   return cmd;
 }
 
-// TODO: Read and return the memory used by a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Ram(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Ram(int pid) {
+  std::ifstream fs(kProcDirectory + std::to_string(pid) + kStatusFilename);
+  if (!fs.is_open()) {
+    return string("0");
+  }
+  string value("0"), label, line;
+  std::istringstream s_stream;
+  while (getline(fs, line)) {
+    s_stream.clear();
+    s_stream.str(line);
+    s_stream >> label >> value;
+    if (label == "VmSize:") {
+      return value;
+    }
+  }
+  return value;
+}
 
 string LinuxParser::Uid(int pid) {
   std::ifstream fs(kProcDirectory + std::to_string(pid) + kStatusFilename);
@@ -249,6 +266,9 @@ string LinuxParser::Uid(int pid) {
 
 string LinuxParser::User(int pid) {
   string uid = LinuxParser::Uid(pid);
+  if (uid.find("0", 0) != string::npos) {
+    return "root";
+  }
   std::ifstream fs(kPasswordPath);
   if (!fs.is_open()) {
     return "";
@@ -280,14 +300,10 @@ long LinuxParser::UpTime(int pid) {
   std::istream_iterator<string> beginning(bufLine), end;
   std::vector<string> values(beginning, end);
 
-  std::istringstream s_stream(Kernel());
-  std::getline(s_stream, major, '.');
-  std::getline(s_stream, minor, '.');
-
-  if (std::stoi(major) == 2 && std::stoi(minor) == 6) {
-    return Jiffies() - std::stof(values[22])/sysconf(_SC_CLK_TCK); 
+  if (!System::IsModernLinux()) {
+    return Jiffies() - std::stof(values[22]) / sysconf(_SC_CLK_TCK);
   } else {
-    return UpTime() - std::stof(values[22])/sysconf(_SC_CLK_TCK);
+    return UpTime() - std::stof(values[22]) / sysconf(_SC_CLK_TCK);
   }
   return 0;
 }
