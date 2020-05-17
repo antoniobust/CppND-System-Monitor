@@ -266,9 +266,6 @@ string LinuxParser::Uid(int pid) {
 
 string LinuxParser::User(int pid) {
   string uid = LinuxParser::Uid(pid);
-  if (uid.find("0", 0) != string::npos) {
-    return "root";
-  }
   std::ifstream fs(kPasswordPath);
   if (!fs.is_open()) {
     return "";
