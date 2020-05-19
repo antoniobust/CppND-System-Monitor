@@ -305,6 +305,5 @@ long LinuxParser::UpTime(int pid) {
 
 bool LinuxParser::IsProcess(std::filesystem::directory_entry d) {
   std::string name = d.path().filename();
-  std::is_dig
   return name.find_first_not_of("0123456789") > name.length();
 }
