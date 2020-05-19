@@ -65,7 +65,7 @@ float LinuxParser::MemoryUtilization() {
   string line, label, tot, free, buffers;
   std::ifstream fs(kProcDirectory + kMeminfoFilename);
   if (!fs.is_open()) {
-    return 0.0;
+    return 0;
   }
   std::istringstream s_stream;
   std::getline(fs, line);
@@ -153,10 +153,11 @@ vector<string> LinuxParser::SystemCpus() {
   std::istringstream s_stream;
   std::vector<std::string> cpus;
   while (getline(fs, line)) {
+    s_stream.clear();
     s_stream.str(line);
     s_stream >> label;
-    if (label.find("cpu", 0)) {
-      return cpus;
+    if (label.find("cpu", 0) == string::npos) {
+      break;
     } else {
       cpus.push_back(label);
     }
