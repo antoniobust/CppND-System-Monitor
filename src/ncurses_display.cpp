@@ -89,9 +89,11 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
 
 void NCursesDisplay::Display(System& system, int n) {
   initscr();      // start ncurses
+  curs_set(0);    // hide cursor
   noecho();       // do not print input values
   cbreak();       // terminate ncurses on ctrl + c
   start_color();  // enable color
+
 
   int x_max{getmaxx(stdscr)};
   WINDOW* system_window = newwin(11, x_max - 1, 0, 0);

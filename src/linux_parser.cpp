@@ -19,20 +19,22 @@ string LinuxParser::OperatingSystem() {
   string key;
   string value;
   std::ifstream filestream(kOSPath);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
-      std::replace(line.begin(), line.end(), ' ', '_');
-      std::replace(line.begin(), line.end(), '=', ' ');
-      std::replace(line.begin(), line.end(), '"', ' ');
-      std::istringstream linestream(line);
-      while (linestream >> key >> value) {
-        if (key == "PRETTY_NAME") {
-          std::replace(value.begin(), value.end(), '_', ' ');
-          return value;
-        }
-      }
+  if (!filestream.is_open()) {
+    return std::string("N/A");
+  }
+  while (std::getline(filestream, line)) {
+    std::replace(line.begin(), line.end(), ' ', '_');
+    std::replace(line.begin(), line.end(), '=', ' ');
+    std::replace(line.begin(), line.end(), '"', ' ');
+    std::istringstream linestream(line);
+    std::istream_iterator<string> beginning(linestream), end;
+    std::vector<string> values(beginning, end);
+    if (values[0] == "PRETTY_NAME") {
+      std::replace(values[1].begin(), values[1].end(), '_', ' ');
+      return values[1];
     }
   }
+
   return value;
 }
 
