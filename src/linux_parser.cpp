@@ -243,7 +243,7 @@ string LinuxParser::Ram(int pid) {
     s_stream.str(line);
     s_stream >> label >> value;
     if (label == "VmSize:") {
-      return value;
+      break;
     }
   }
   return value;
@@ -252,26 +252,26 @@ string LinuxParser::Ram(int pid) {
 string LinuxParser::Uid(int pid) {
   std::ifstream fs(kProcDirectory + std::to_string(pid) + kStatusFilename);
   if (!fs.is_open()) {
-    return string();
+    return string("N/A");
   }
-  string line, uid;
+  string line(""), uid("");
   std::istringstream s_stream;
   while (std::getline(fs, line)) {
     if (line.find("Uid", 0) != string::npos) {
       s_stream.clear();
       s_stream.str(line);
       s_stream >> uid >> uid;
-      return uid;
+      break;
     }
   }
-  return line;
+  return uid;
 }
 
 string LinuxParser::User(int pid) {
   string uid = LinuxParser::Uid(pid);
   std::ifstream fs(kPasswordPath);
   if (!fs.is_open()) {
-    return "";
+    return string("N/A");
   }
   string line;
   string user, userId, pwd;
@@ -283,10 +283,10 @@ string LinuxParser::User(int pid) {
     std::getline(s_stream, pwd, ':');
     std::getline(s_stream, userId, ':');
     if (uid.compare(userId) == 0) {
-      return user;
+      break;
     }
   }
-  return string();
+  return user;
 }
 
 long LinuxParser::UpTime(int pid) {
@@ -304,6 +304,7 @@ long LinuxParser::UpTime(int pid) {
 }
 
 bool LinuxParser::IsProcess(std::filesystem::directory_entry d) {
-  string name = d.path().filename();
+  std::string name = d.path().filename();
+  std::is_dig
   return name.find_first_not_of("0123456789") > name.length();
 }
